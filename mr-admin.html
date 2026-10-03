@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>管理者ログイン</title>
+
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f8f6f8;
+      text-align: center;
+      padding: 50px 20px;
+    }
+
+    .login-box {
+      max-width: 400px;
+      margin: 0 auto;
+      background: white;
+      padding: 30px 20px;
+      border-radius: 15px;
+    }
+
+    input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 12px;
+      margin: 8px 0;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 15px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="login-box">
+
+    <h1>管理者ログイン</h1>
+
+    <input
+      type="email"
+      id="email"
+      placeholder="メールアドレス"
+    >
+
+    <input
+      type="password"
+      id="password"
+      placeholder="パスワード"
+    >
+
+    <button onclick="login()">
+      ログイン
+    </button>
+
+    <p id="message"></p>
+
+<div id="voteCounts"></div>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+
+    const SUPABASE_URL = "https://kyatjomzupddnmbmyjvu.supabase.co";
+
+    const SUPABASE_KEY =
+      "sb_publishable_J7t9c_3CtqXmpGv3nmJKfQ_g8MocwYp";
+
+    const supabaseClient = window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_KEY
+    );
+
+
+    async function login() {
+
+      const email =
+        document.getElementById("email").value;
+
+      const password =
+        document.getElementById("password").value;
+
+
+      const { data, error } =
+        await supabaseClient.auth.signInWithPassword({
+          email: email,
+          password: password
+        });
+
+
+      if (error) {
+
+        document.getElementById("message").textContent =
+          "ログインに失敗しました。";
+
+        console.error(error);
+
+        return;
+      }
+
+
+      document.getElementById("message").textContent =
+        "ログインしました！";
+
+      console.log("ログイン成功:", data);
+
+const { data: voteData, error: voteError } =
+  await supabaseClient.rpc("get_mr_vote_counts");
+
+if (voteError) {
+  console.error("投票数取得エラー:", voteError);
+
+  document.getElementById("voteCounts").textContent =
+    "投票数を取得できませんでした。";
+
+  return;
+}
+
+const voteCounts =
+  document.getElementById("voteCounts");
+
+voteCounts.innerHTML = `
+  <h2>現在の投票数</h2>
+`;
+
+voteData.forEach(candidate => {
+
+  const item = document.createElement("p");
+
+  item.textContent =
+    `${candidate.candidate_name}：${candidate.vote_count}票`;
+
+  voteCounts.appendChild(item);
+
+});
+
+    }
+
+  </script>
+
+</body>
+
+</html>
