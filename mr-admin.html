@@ -161,6 +161,84 @@ if (dailyError) {
   voteCounts.innerHTML += `
     <h2>日別・候補者別投票数</h2>
   `;
+
+  const candidates = [...new Set(
+    dailyData.map(row => row.candidate_name)
+  )];
+
+  const dates = [...new Set(
+    dailyData.map(row => row.vote_date)
+  )];
+
+  let tableHTML = `
+    <table style="
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    ">
+      <thead>
+        <tr>
+          <th style="border: 1px solid #ddd; padding: 8px;">日付</th>
+  `;
+
+  candidates.forEach(name => {
+    tableHTML += `
+          <th style="border: 1px solid #ddd; padding: 8px;">
+            ${name}
+          </th>
+    `;
+  });
+
+  tableHTML += `
+          <th style="border: 1px solid #ddd; padding: 8px;">合計</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+
+  dates.forEach(date => {
+
+    let total = 0;
+
+    tableHTML += `
+        <tr>
+          <td style="border: 1px solid #ddd; padding: 8px;">
+            ${date}
+          </td>
+    `;
+
+    candidates.forEach(name => {
+
+      const row = dailyData.find(
+        r => r.vote_date === date &&
+             r.candidate_name === name
+      );
+
+      const count = row ? Number(row.vote_count) : 0;
+
+      total += count;
+
+      tableHTML += `
+          <td style="border: 1px solid #ddd; padding: 8px;">
+            ${count}票
+          </td>
+      `;
+    });
+
+    tableHTML += `
+          <td style="border: 1px solid #ddd; padding: 8px;">
+            ${total}票
+          </td>
+        </tr>
+    `;
+  });
+
+  tableHTML += `
+      </tbody>
+    </table>
+  `;
+
+  voteCounts.innerHTML += tableHTML;
 }
     }
 
