@@ -147,7 +147,21 @@ voteData.forEach(candidate => {
   voteCounts.appendChild(item);
 
 });
+const { data: dailyData, error: dailyError } =
+  await supabaseClient.rpc("get_mr_daily_vote_counts");
 
+if (dailyError) {
+  console.error("日別投票数取得エラー:", dailyError);
+
+  voteCounts.innerHTML +=
+    "<p>日別投票数を取得できませんでした。</p>";
+
+} else {
+
+  voteCounts.innerHTML += `
+    <h2>日別・候補者別投票数</h2>
+  `;
+}
     }
 
   </script>
