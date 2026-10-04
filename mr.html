@@ -321,6 +321,13 @@ const today =
   String(now.getMonth() + 1).padStart(2, "0") + "-" +
   String(now.getDate()).padStart(2, "0");
 
+      // ネット投票の締切
+const deadline = new Date("2026-11-07T00:00:00+09:00");
+
+if (now >= deadline) {
+  alert("ネット投票は終了しました。");
+  return;
+}
 
       // 投票を保存
       const { error: insertError } =
@@ -379,8 +386,23 @@ const today =
 
     }
 
+   function checkDeadline() {
+  const now = new Date();
+  const deadline = new Date("2026-11-07T00:00:00+09:00");
+
+  if (now >= deadline) {
+    const voteButtons =
+      document.querySelectorAll(".vote-button");
+
+    voteButtons.forEach(button => {
+      button.disabled = true;
+      button.textContent = "ネット投票は終了しました";
+    });
+  }
+}
 
     loadCandidates();
+    checkDeadline();
 
   </script>
 
